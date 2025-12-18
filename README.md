@@ -1,2 +1,0 @@
-# tamomar
-u.u
