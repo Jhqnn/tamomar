@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Índice de Compatibilidad 💖</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: radial-gradient(circle at top, #ff9acb, #1b1b25);
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.bg-glow {
+  position: absolute;
+  width: 120vmax;
+  height: 120vmax;
+  background: radial-gradient(circle, rgba(255,182,213,0.2), transparent 65%);
+  animation: pulse 10s infinite alternate;
+}
+@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.1); } }
+
+.app {
+  position: relative;
+  width: 100%;
+  max-width: 450px;
+  padding: 36px 28px;
+  text-align: center;
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  box-shadow: 0 25px 60px rgba(255,105,180,0.35);
+  animation: fadeIn 1s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+h1 { font-size: 1.7rem; margin-bottom: 12px; font-weight: 600; }
+p { font-size: 1.05rem; line-height: 1.5; opacity: 0.95; transition: opacity 0.5s; }
+.options { margin-top: 28px; display: flex; flex-direction: column; gap: 16px; }
+button {
+  padding: 16px 20px;
+  border-radius: 22px;
+  border: none;
+  background: linear-gradient(135deg, #ff6aa2, #2b1020);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.2s;
+  box-shadow: 0 10px 26px rgba(255, 106, 162, 0.45);
+}
+button:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(255, 106, 162, 0.55); }
+button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+.progress { margin-top: 22px; font-size: 0.9rem; opacity: 0.75; transition: opacity 0.4s; }
+.fade-out { opacity: 0; transition: opacity 0.6s ease; }
+.heart { position: absolute; bottom: -20px; font-size: 22px; animation: floatUp 5s linear forwards; opacity: 0.9; pointer-events: none; }
+@keyframes floatUp { from { transform: translateY(0) scale(1); opacity: 0.9; } to { transform: translateY(-130vh) scale(1.2); opacity: 0; } }
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<div class="app" id="app">
+  <h1 id="title">Índice de Compatibilidad</h1>
+  <p id="text">Antes de empezar, necesito entender algo.</p>
+  <div class="options" id="options"></div>
+  <div class="progress" id="progress"></div>
+</div>
+<audio id="music" loop><source src="music.mp3" type="audio/mpeg"></audio>
+<script>
+// Configuración de pantallas y preguntas
+const screens=[
+  { text:"Del 1 al 10, ¿qué tan fan eres de quedarte hablando conmigo hasta tarde?", options:["1–3","4–6","7–8","9–10"] },
+  { text:"¿Por qué crees que te cuesta encariñarte?", options:["Porque me toma tiempo","Porque soy reservada","Porque no cualquiera llega ahí"] },
+  { text:"Cuando hablás con alguien que te importa, preferís…", options:["Hablar tranquila","Decir poco pero sentir mucho"] },
+  { text:"Cuando alguien te importa de verdad, sos más de…", options:["Demostrarlo","Joderlo con cariño"] },
+  { text:"¿Qué te hace sonreír sin razón?", options:["Un mensaje inesperado","Un gesto bonito","Pasar un momento divertido"] },
+  { text:"Si pudieras elegir, ¿un plan relajado o aventura inesperada?", options:["Relajado","Aventura"] }
+];
+
+let index=0, locked=false, compatibility=0;
+const answers=[];
+const textEl=document.getElementById('text');
+const optionsEl=document.getElementById('options');
+const progressEl=document.getElementById('progress');
+const music=document.getElementById('music');
+
+// Función de renderizado con transición suave
+function renderScreen(){
+  optionsEl.innerHTML="";
+  progressEl.textContent=index<screens.length?`Compatibilidad actual: ${compatibility}%`:"";
+  if(index<screens.length){
+    textEl.classList.add('fade-out');
+    setTimeout(()=>{
+      textEl.classList.remove('fade-out');
+      textEl.textContent=screens[index].text;
+      screens[index].options.forEach(opt=>{
+        const btn=document.createElement('button');
+        btn.textContent=opt;
+        btn.onpointerdown=()=>handleAnswer(opt);
+        optionsEl.appendChild(btn);
+      });
+    },400);
+  }else showFinal();
+}
+
+// Manejo de respuesta con cooldown
+function handleAnswer(answer){
+  if(locked) return;
+  locked=true;
+  answers.push(answer);
+  compatibility+=Math.floor(Math.random()*12)+15;
+  if(compatibility>96) compatibility=96;
+  Array.from(optionsEl.children).forEach(b=>b.disabled=true);
+  setTimeout(()=>{ index++; locked=false; renderScreen(); },900);
+}
+
+// Flujo final con carga, error y revelación romántica
+function showFinal(){ showLoadingScreen(); }
+function showLoadingScreen(){
+  progressEl.textContent="Comparando resultados…";
+  textEl.textContent="Analizando coincidencias…";
+  optionsEl.innerHTML="";
+  let dots=0;
+  const loader=setInterval(()=>{ dots=(dots+1)%4; textEl.textContent="Analizando coincidencias"+'.'.repeat(dots); },400);
+  setTimeout(()=>{ clearInterval(loader); showErrorScreen(); },3500);
+}
+function showErrorScreen(){
+  textEl.innerHTML=`<strong>Error.</strong><br><br>No se encontró ninguna base de datos.<br>No se compararon respuestas con nadie.`;
+  progressEl.textContent="Compatibilidad: indeterminada";
+  setTimeout(()=>{ showTrueFinal(); },5000);
+}
+function showTrueFinal(){
+  compatibility=100;
+  progressEl.textContent="Compatibilidad detectada: 100%";
+  textEl.innerHTML=`Este 100% no es por las respuestas que diste acá<br><br>Es porque aunque seamos diferentes<br><strong>decidí que quiero pasar, y dedicar mi 100% a ti</strong>`;
+  optionsEl.innerHTML="";
+  startRomanticMode();
+}
+
+// Modo romántico con música y corazones
+function startRomanticMode(){
+  music.volume=0.35; music.play().catch(()=>{});
+  setInterval(createHeart,500);
+}
+function createHeart(){
+  const heart=document.createElement('div');
+  heart.className='heart';
+  heart.textContent='❤';
+  heart.style.left=Math.random()*100+'vw';
+  heart.style.fontSize=(18+Math.random()*24)+'px';
+  document.body.appendChild(heart);
+  setTimeout(()=>heart.remove(),5000);
+}
+
+renderScreen();
+</script>
+</body>
+</html>
